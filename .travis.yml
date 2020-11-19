@@ -1,33 +1,39 @@
 language: node_js
 env:
   global:
-    - CC_TEST_REPORTER_ID=c6a75a1118cf4779ae1ed6351d6dbdbdf39b4b8510ed51b2692f2518efcae7ec
+  - CC_TEST_REPORTER_ID=c6a75a1118cf4779ae1ed6351d6dbdbdf39b4b8510ed51b2692f2518efcae7ec
 matrix:
   include:
   - node_js: '12'
 cache:
-  directories: [node_modules]
-install:
-  yarn
+  directories:
+  - node_modules
+install: yarn
 after_success: yarn coverage
 before_script:
-  - psql -c 'create database testdb;' -U postgres
-  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-  - chmod +x ./cc-test-reporter
-  - ./cc-test-reporter before-build
+- psql -c 'create database testdb;' -U postgres
+- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64
+  > ./cc-test-reporter
+- chmod +x ./cc-test-reporter
+- "./cc-test-reporter before-build"
 script:
-  - yarn test
+- yarn test
 after_script:
-  - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESUL
-
+- "./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESUL"
 services:
-  - postgresql
+- postgresql
 addons:
-  postgresql: "10"
+  postgresql: '10'
   apt:
     packages:
     - postgresql-10
     - postgresql-client-10
 before_install:
-  - sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
-  - sudo /etc/init.d/postgresql restart
+- sudo cp /etc/postgresql/{9.6,10}/main/pg_hba.conf
+- sudo /etc/init.d/postgresql restart
+deploy:
+  provider: heroku
+  app:
+    master: app-name
+  api_key:
+    secure: cMGvP8D6ZAhSVqsKkqBfC5g35M9Kzm2SxB0LL3SbNmFem2mJJ485Jx5J18Iib0PJuCOe6/n4xSCHViUtmVLRYGZOXFOVmrDKLxvsjoAkX/jSdWn2ugxIbIx+CbJp70qLuSePLZjLz2LVcRNAURn4XXsXzpuNTYQpMg/HMC339O9GKxBnQM2kVIMrSz2VeoK0yZ4JdJwfGzA/k3RqF9aVuUoIJeOlfodu9PDW+89qa1+3TEOJreINUyajVwxh2Pt89tScR4BB4HduDKogv3nj7iLsF7D5StkF68yGtHhwimhN23bmjld0Q/7j0oSB4pIzp0AevgJUKRojsRLEEWRBec+pGh+J07amN5lJdscOMu2Z6DDX1vgEbE7AJnQk7qk5UNalNXgVtHCtxWAFdjnMxzr+3Ft74m64WQOXwVr90ADxrx8JMLDRFxIXzMl+uz01ECjh7szWuA34Pdkaibzq3MIeUHsbv2GEzP7XoQ0ISJ8XueUgxs/cmw/sDhBEEF0CeFI5Tod+FfpLUPf+7U8NlTpTqgABIkOt0UTbJszUBdEr3GWxk8wU8QOLwiSSRV9V6JhuGfvIJTGUE9sMpOKVx7sJ4Wg4ptIWvDiC6HaZ9MDQkuW3BnrsYKddIG3Up6Fg0K8MQWGEA+HwD0c/1lFYhtZhFpCKmrd1axsSkYIQY9w=
